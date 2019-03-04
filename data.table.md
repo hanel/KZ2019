@@ -1,0 +1,203 @@
+data.table
+================
+
+### Data.table
+
+> ###### resources:
+> 
+>   - data.table [home
+>     page](https://github.com/Rdatatable/data.table/wiki)
+>   - data.table [cheat
+>     sheet](https://s3.amazonaws.com/assets.datacamp.com/img/blog/data+table+cheat+sheet.pdf)
+
+Data.table is enhanced data.frame.
+
+From DataCamp blog: “Data.table allows you to reduce your programming
+time as well as your computing time considerably, and it is especially
+useful if you often find yourself working with large datasets. For
+example, to read in a 20GB .csv file with 200 million rows and 16
+columns, data.table only needs 8 minutes thanks to the fread() function.
+This is instead of the hours it would take you with the read.csv()
+function. Once you understand its concepts and principles, the speed and
+simplicity of the package are astonishing\!”
+
+#### Creation of data.tables
+
+  - conversion from data.frame, matrix
+  - build form scratch in the same way as data.frame
+  - variables can be add using `:=` operator
+  - special characters, e.g. `.N` - length, `.` =
+`list`
+
+**Example**:
+
+``` r
+dta = data.frame(DTM = seq(as.Date('1991-01-01'), as.Date('2000-12-31'), by = 'days'))
+dta$X = rnorm(nrow(dta))
+dta$GROUP = cut(dta$X, breaks = 4)
+```
+
+``` r
+library(data.table)
+dta = data.table(dta)
+dta[, Y := rnorm(.N)]
+```
+
+#### General structure of data.tables calls:
+
+`DT[i, j, by]` means:
+
+Take data.table `DT`, select rows using `i`, then calculate `j` possibly
+grouped by `by`.
+
+#### Selection
+
+  - the name of the data.table can be omitted, consider
+
+<!-- end list -->
+
+``` r
+dta[DTM<as.Date('1992-01-01')]
+dta[year(DTM) < 1993]
+dta[X < 0, ]
+dta[GROUP == GROUP[1]]
+```
+
+#### Column arithmetics
+
+  - the name of the data.table can be omitted, results either single
+    vector, new variable inside data.table or new data.table
+
+<!-- end list -->
+
+``` r
+# single vector
+dta[, X * Y]
+dta[, mean(X*Y)]
+
+# new variable
+dta[, Z := X * Y]
+dta[, M := mean(X)]
+
+# new data.table
+dta[, .(X * Y, Z)]
+dta[, .(XX = X * Y, Z)]
+```
+
+#### Calculation by groups
+
+  - groups are specified as the `by` argument
+
+<!-- end list -->
+
+``` r
+dta[, mean(X), by = GROUP]
+dta[, mean(X), by = month(DTM)]
+```
+
+  - groups can be easilly combined
+
+<!-- end list -->
+
+``` r
+dta[, mean(X), by = .(GROUP, month(DTM))]
+```
+
+#### Combination of data.tables
+
+##### Concatenation
+
+  - by rows - `rbind`
+  - by columns - `cbind` (in general not recommended - other database
+    operations are prefered)
+
+<!-- end list -->
+
+``` r
+a = data.table(x = 1:2, y = 1:2)
+b = data.table(x = 3:4, y = c(3,1))
+rbind(a, b)
+```
+
+    ##    x y
+    ## 1: 1 1
+    ## 2: 2 2
+    ## 3: 3 3
+    ## 4: 4 1
+
+##### merge
+
+Two tables can be merged using common key columns (often date, station
+etc.).
+
+  - general
+syntax:
+
+<!-- end list -->
+
+``` r
+merge(x, y, by = NULL, by.x = NULL, by.y = NULL, all = FALSE, all.x = all, all.y = all)
+```
+
+**Examples**:
+
+Key column same name, same coverage
+
+``` r
+x = data.table(YEAR = 2005:2010, X = rnorm(6))
+y = data.table(YEAR = 2005:2010, Y = rnorm(6))
+merge(x, y, by = 'YEAR')
+```
+
+Key column different name, same coverage
+
+``` r
+x = data.table(YEAR = 2005:2010, X = rnorm(6))
+y = data.table(ROK = 2005:2010, Y = rnorm(6))
+merge(x, y, by.x = 'YEAR', by.y = 'ROK')
+```
+
+Different coverage, outher join
+
+``` r
+x = data.table(YEAR = 2000:2010, X = rnorm(11))
+y = data.table(YEAR = 2005:2012, Y = rnorm(8))
+merge(x, y, by = 'YEAR', all = TRUE)
+```
+
+Different coverage, inner join
+
+``` r
+x = data.table(YEAR = 2000:2010, X = rnorm(11))
+y = data.table(YEAR = 2005:2012, Y = rnorm(8))
+merge(x, y, by = 'YEAR', all = FALSE)
+```
+
+Different coverage, left join
+
+``` r
+x = data.table(YEAR = 2000:2010, X = rnorm(11))
+y = data.table(YEAR = 2005:2012, Y = rnorm(8))
+merge(x, y, by = 'YEAR', all.x = TRUE, all.y = FALSE)
+```
+
+Different coverage, right join
+
+``` r
+x = data.table(YEAR = 2000:2010, X = rnorm(11))
+y = data.table(YEAR = 2005:2012, Y = rnorm(8))
+merge(x, y, by = 'YEAR', all.x = FALSE, all.y = TRUE)
+```
+
+##### Data.table fast join (data.table version \>= v1.9.6)
+
+  - special data.table syntax:
+
+<!-- end list -->
+
+``` r
+x = data.table(YEAR = 2000:2010, X = rnorm(11))
+y = data.table(YEAR = 2005:2012, Y = rnorm(8))
+x[y, on = 'YEAR', ]               # right join
+x[y, on = 'YEAR', nomatch = 0]    # inner join
+```
