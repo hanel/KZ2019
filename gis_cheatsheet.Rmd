@@ -1,0 +1,235 @@
+---
+title: "R GIS"
+output: 
+  github_document: 
+    toc: yes
+---
+
+<style type="text/css">
+.table {
+
+    width: 100%;
+
+}
+</style>
+
+```{r, warning=FALSE, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = '', prompt = TRUE)            
+```
+
+
+# Vector data
+
+```{r, warning=FALSE}
+library(sp) # provides classes
+library(maptools) # provides i/o, coercion
+```
+
+### Classes
+
+- `SpatialPoints`, `SpatialPointsDataFrame`
+- `SpatialLines`, `SpatialLinesDataFrame`
+- `SpatialPolygons`, `SpatialPolygonsDataFrame`
+- `SpatialRing`, `SpatialRingDataFrame`
+- `SpatialMultiPoints`, `SpatialMultiPointsDataFrame`
+- `SpatialGrid`, `SpatialGridDataFrame`
+- `SpatialPixels`, `SpatialPixelsDataFrame`
+
+### Input/Output
+
+```{r, eval = FALSE, tidy = TRUE}
+# READING shapefiles
+readShapePoints(fn)
+readShapeLines(fn)
+readShapePoly(fn)
+readShapeSpatial(fn)
+
+# WRITTING shapefiles
+writePointsShape(x, fn)
+writeLinesShape(x, fn)
+writePolygonsShape(x, fn)
+writeSpatialShape(x, fn)
+
+# more general - incl. geodatabases etc.
+library(rgdal)
+ogrDrivers() # list supported drivers
+ogrListLayers(dsn) # list layers from Data Source Name (dsn)
+ogrInfo(dsn, layer) # layer info
+ogrFIDs() # list field IDs (FIDs)
+OGRSpatialRef() # projection (proj4string)
+readOGR(dsn, layer) # reading (reads also projection)
+writeOGR(dsn, layer) # writting (writes also projection)
+```
+
+### Data and metadata access
+
+*Creating toy data - `SpatialPointsDataFrame`*
+
+```{r, include = TRUE, echo = -1}
+set.seed(13131)
+d = data.frame(ID = sample(LETTERS, 10), x = rnorm(10), y = rnorm(10), ELE = 300 + rnorm(10, 20, 6)^2)
+row.names(d) = d$ID
+p = SpatialPointsDataFrame(d[, 2:3], d)
+```
+
+###### Number of objects
+```{r}
+length(p)
+```
+
+###### Getting names of variables from attribute table (for `Spatial*DataFrame` only)
+```{r}
+names(p)
+```
+
+###### Accessing attribute table
+```{r}
+p@data
+```
+
+###### Accessing individual variables
+```{r, eval = FALSE}
+# by name
+p$ID 
+p@data$ID 
+p@data[, 'ID']
+
+# by position
+p@data[, 3]
+```
+
+
+###### Selecting individual objects
+```{r, eval = FALSE}
+p[3:4, ] # by position
+p['B', ] # by name
+p[p$ELE < 500, ] # by condition
+```
+
+### Spatial analysis
+
+```{r message=FALSE, warning=FALSE}
+library(rgeos) # provides many functions
+```
+
+command  | meaning
+------------------------------ | ----------------------------------------------------------------------------
+`gBuffer(spgeom, byid, width)` | creates buffer of specified width, possibly separately for each geometry (when `by = TRUE`)
+`gCentroid` | get centroid
+`gContains`, `gCovers` | geometry relationships
+`gDelaunayTriangulation` | triangulation
+`gDifference` | geometry difference
+`gDistance` | distance in map units
+`gIntersection` | find intersection of two spgeoms
+`gIntersects(spgeom1, spgeom2)` | does spgeom1 intersect spegeom2 
+`gLength` | geometry length
+`gSimplify` | simplify geometry
+`gUnion`, `gUnionCascaded` | union geometries
+`gWithinDistance` | returns `TRUE` if the distance of two geometries is less then specified distance
+
+# Raster data
+
+```{r, message=FALSE}
+library(raster)
+```
+
+### Classes
+
+class  | 
+--------- | ---------------------------------------------------------------------
+`raster` | raster layer
+`brick`  | in-memory multi/layer raster object
+`stack`  | collection of raster layers with the same spatial extent and resolution
+
+
+### Input/output
+```{r, eval = FALSE}
+# reading rasters
+raster(file)
+brick(list(file1, file2, ...))
+stack(list(file1, file2, ...))
+
+# writting rasters
+writeRaster(r, 'file')
+```
+
+### Manipulation
+
+###### Working with layers
+```{r, eval = FALSE}
+# create brick from 2 layers
+b = brick(layer1, layer2)
+# select first layer
+b[[1]]
+```
+
+###### Getting and setting values
+
+```{r, eval = FALSE}
+getValues(x) # extract values
+values(x) # the same
+
+setValues(x, values) # set values
+values(x) = values # the same
+```
+
+###### Raster calculations
+```{r, eval = FALSE}
+x + y # sum the values of raster x and raster y
+x / y # etc. ...
+mean(x) # mean of x across layers
+
+calc(x, fun) # apply fun to values of raster x
+cellStats(x, fun) # compute statistics for the cells of each layer of a Raster* object
+```
+
+###### Modification of raster objects
+```{r, eval = FALSE}
+resample(x, y) # transfer values from raster x to raster y (with same projection but different resolution)
+projectRaster(x, y) # project raster x to projection and resolution of raster y
+aggregate(x, fact) # aggregate values to lower resolution
+disaggregate(x, fact) # create raster with higher resolution
+
+crop(x, s) # crop raster x by spatial object s
+mask(x, s) # mask values of raster x by spatial object s
+extract(x, s, fun) # extract values from raster r according to spatial object s, optionally using aggregate function fun
+```
+
+# Coordinate reference systems
+
+- specified as "proj4string"
+
+###### Set or get projection
+```{r, eval = FALSE}
+# getting projection
+projection(x)
+crs(temp)
+x@crs # for raster class
+x@proj4string # for sp* classes
+
+# setting proj4string (this is different from projecting raster)
+projection(x) = crsString
+crs(x) = crsString
+```
+
+###### Transformations
+```{r, eval = FALSE}
+# vectors
+spTransform(x, CRS) # transform x (with specified CRS) to new CRS
+
+# raster
+projectRaster(r, crs = CRS) # project raster r to new CRS
+```
+
+###### Specifying projections
+```{r}
+# WGS
+CRS('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs')
+# krovak S-JTSK
+CRS('+proj=krovak +lat_0=49.5 +lon_0=24.83333333333333 +alpha=0 +k=0.9999 +x_0=0 +y_0=0 +ellps=bessel +units=m +no_defs')
+# specification by epsg
+CRS('+init=epsg:4326') # WGS
+CRS('+init=epsg:2065') # krovak
+```
+
+***

@@ -231,3 +231,33 @@ Modelování dopadů změny klimatu probíhá podle následujícího schematu:
 -   kde *pozorovaná data* jsou měsíční srážky a teplota z minulého cvičení
 -   *scénářová data* budou vytvořena přírůstkovou metodou
 -   *hydrologický model* je nakalibrovaný model z minulého cvičení
+
+##### Simulace klimatických modelů
+
+Pro účely tohoto cvičení jsou k dispozici srážky a teplota simulované globálním klimatickým modelem HadGEM. Ve složce `data` jde o soubory s příponou `nc`. Jedná se o soubory typu NetCDF - tento formát je často používán v klimatologii. Pro práci s těmito soubory budeme potřbovat (navíc k balíkům, které jsme používali minule) balíky `ncdf4` a `raster`. Přehled základních funkcí balíku `raster` i příkazů pro práci s vektorovými geodaty je v souboru `gis_cheatsheet.md`.
+
+------------------------------------------------------------------------
+
+-   \[ \] Načtěte jeden ze souborů simulací klimatického modelu pomocí příkazu `brick`
+-   \[ \] Načtěte vybrané povodí z minulého cvičení
+-   \[ \] Vypište informace o načtených souborech
+-   \[ \] Vykreslete oba soubory
+
+------------------------------------------------------------------------
+
+``` r
+library(raster)
+```
+
+    ## 
+    ## Attaching package: 'raster'
+
+    ## The following object is masked from 'package:data.table':
+    ## 
+    ##     shift
+
+``` r
+t_ctrl = brick('./data/pr_mon_HadGEM2-ES_historical_r1i1p1-1950-2100.nc')
+```
+
+    ## Loading required namespace: ncdf4
