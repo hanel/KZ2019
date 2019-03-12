@@ -60,3 +60,12 @@ rm = ts(res[, RM], start = c(res[1, year(DTM)], res[1, month(DTM)]), frequency =
 re = cbind(r, rm)
 
 dygraph(re) %>% dyRangeSelector() %>% dyRoller(rollPeriod = 5)
+
+
+
+### Ulozim praci:
+
+setwd('../vysledky/')
+saveRDS(mdta, 'obs.rds')
+
+saveRDS(mojePov, 'mojePov.rds')
