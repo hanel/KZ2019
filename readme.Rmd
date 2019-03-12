@@ -1,6 +1,8 @@
 ---
 title: "Hydrologické modelování dopadů klimatických změn (2018/2019)"
-output: github_document
+output: 
+  github_document: 
+    toc: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -125,7 +127,7 @@ bil.get.params(b)
 ---
 
 
-### Nápověda:
+### Nápověda
 
 #### Práce s `data.table`
 
@@ -203,6 +205,8 @@ Pro účely tohoto cvičení jsou k dispozici srážky a teplota simulované glo
 ```{r}
 library(raster)
 
-t_ctrl = brick('./data/pr_mon_HadGEM2-ES_historical_r1i1p1-1950-2100.nc')
+t_ctrl = brick('./data/tas_mon_HadGEM2-ES_historical_r1i1p1-1950-2100.nc')
+plot(t_ctrl)
 ```
+
 

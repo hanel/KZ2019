@@ -1,6 +1,14 @@
 Hydrologické modelování dopadů klimatických změn (2018/2019)
 ================
 
+-   [Zadání projektu](#zadání-projektu)
+-   [Blok 1 - Modelování hydrologické bilance a dopadů klimatické změny](#blok-1---modelování-hydrologické-bilance-a-dopadů-klimatické-změny)
+    -   [Data](#data)
+    -   [Model Bilan](#model-bilan)
+    -   [Cvičení 1: Hydrologická bilance](#cvičení-1-hydrologická-bilance)
+    -   [Nápověda](#nápověda)
+    -   [Cvičení 2: Dopady klimatické změny](#cvičení-2-dopady-klimatické-změny)
+
 ### Zadání projektu
 
 ##### Pro vybrané povodí zjistěte očekávané změny hydrologické bilance a vyhodnoťte účinek opatření v podobě vodní nádrže a zvýšení retence půdy.
@@ -173,7 +181,7 @@ bil.get.params(b)
 
 ------------------------------------------------------------------------
 
-### Nápověda:
+### Nápověda
 
 #### Práce s `data.table`
 
@@ -257,7 +265,13 @@ library(raster)
     ##     shift
 
 ``` r
-t_ctrl = brick('./data/pr_mon_HadGEM2-ES_historical_r1i1p1-1950-2100.nc')
+t_ctrl = brick('./data/tas_mon_HadGEM2-ES_historical_r1i1p1-1950-2100.nc')
 ```
 
     ## Loading required namespace: ncdf4
+
+``` r
+plot(t_ctrl)
+```
+
+![](readme_files/figure-markdown_github/unnamed-chunk-9-1.png)
