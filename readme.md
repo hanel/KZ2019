@@ -303,7 +303,7 @@ plot(pov, add = TRUE)
 
 ![](readme_files/figure-markdown_github/unnamed-chunk-10-1.png)
 
-> :question: Proč nevidíme na mapě povodí?
+:question: Proč nevidíme na mapě povodí?
 
 ###### Projekce
 
@@ -353,4 +353,4 @@ delt[, T_del := T_scen-T_ctrl]
 
 Sloupec `del` obsahuje změny ve stupních.
 
-> :exclamation: V našem zadání bude `sim` i `ctrl` obsahovat i srážky. U srážek nebudeme uvažovat rozdíl, ale podíl.
+:exclamation: V našem zadání bude `sim` i `ctrl` obsahovat i srážky. U srážek nebudeme uvažovat rozdíl, ale podíl.
