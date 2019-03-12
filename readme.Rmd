@@ -9,12 +9,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Zadání projektu
 
-##### Pro vybrané povod9 zjistěte očekávané změny hydrologické bilance a vyhodnoťte účinek opatření v podobě vodní nádrže a zvýšení retence půdy.
+##### Pro vybrané povodí zjistěte očekávané změny hydrologické bilance a vyhodnoťte účinek opatření v podobě vodní nádrže a zvýšení retence půdy.
 
 
 ---
 
-### Blok 1 - Modelování hydrologické bilance a dopadů klimatické změny
+## Blok 1 - Modelování hydrologické bilance a dopadů klimatické změny
 
 Cílem tohoto bloku je získání dat pro vybrané povodí, kalibrace modelu Bilan a odhad dopadů klimatické změny. 
 
@@ -105,20 +105,22 @@ bil.get.params(b)
 
 
 
-
+### Cvičení 1: Hydrologická bilance
 
 ---
 
 
-> 1. vyberte jedno povodí, vytvořte proměnnou obsahující data jen pro vybrané povodí (jak hydroklimatická data, tak rozvodnici povodí).
+> 
 
-> 2. převeďte data do měsíčního časového kroku
+1. vyberte jedno povodí, vytvořte proměnnou obsahující data jen pro vybrané povodí (jak hydroklimatická data, tak rozvodnici povodí).
 
-> 3. vytvořte model Bilan, vložte do něj data a nakalibrujte
+2. převeďte data do měsíčního časového kroku
 
-> 4. vyhodnoťte kalibraci
+3. vytvořte model Bilan, vložte do něj data a nakalibrujte
 
-> - v protokolu bude: (1) obrázek vybraného území, (2) základní hydroklimatické charakteristiky, (3) vyhodnocení kalibrace modelu Bilan, (4) tabulka s parametry.
+4. vyhodnoťte kalibraci
+
+- v protokolu bude: (1) obrázek vybraného území, (2) základní hydroklimatické charakteristiky, (3) vyhodnocení kalibrace modelu Bilan, (4) tabulka s parametry.
 
 ---
 
@@ -169,3 +171,10 @@ leaflet(wpov) %>% addTiles()  %>% addPolygons()
 ```
 
 
+### Cvičení 2: Dopady klimatické změny
+
+Cílem tohoto cvičení je tvorba scénářů změny klimatu, simulace hydrologické bilance ovlivněné klimatickou změnou a vyhodnocení dopadů klimatické změny na hydrologickou bilanci.
+
+#### Scénáře změny klimatu
+
+Pro tvorbu scénářů změny klimatu využijeme jednu z nejjednodušších metod, tj. přírůstkovou metodu.
