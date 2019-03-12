@@ -177,4 +177,17 @@ Cílem tohoto cvičení je tvorba scénářů změny klimatu, simulace hydrologi
 
 #### Scénáře změny klimatu
 
-Pro tvorbu scénářů změny klimatu využijeme jednu z nejjednodušších metod, tj. přírůstkovou metodu.
+Pro tvorbu scénářů změny klimatu využijeme jednu z nejjednodušších metod, tj. přírůstkovou metodu. Tato metoda je založena na úpravě pozorované časové řady srážek a teploty tak, že změny mezi upravenou a původní časovou řadou jsou pro jednotlivé měsíce stejné jako mezi scénářovým a kontroloním období v simulaci klimatického modelu.
+
+Modelování dopadů změny klimatu probíhá podle následujícího schematu:
+
+![modelovani](http://rscn.vuv.cz/rscn/wp-content/uploads/2014/01/obr2-1.png)
+
+- kde *pozorovaná data* jsou měsíční srážky a teplota z minulého cvičení
+- *scénářová data* budou vytvořena přírůstkovou metodou
+- *hydrologický model* je nakalibrovaný model z minulého cvičení
+
+##### Simulace klimatické změny
+
+Pro účely tohoto cvičení jsou k dispozici srážky a teplota simulované klimatickým modelem pro ČR.
+

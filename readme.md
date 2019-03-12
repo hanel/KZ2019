@@ -3,20 +3,18 @@ Hydrologické modelování dopadů klimatických změn (2018/2019)
 
 ### Zadání projektu
 
-##### Pro vybrané povod9 zjistěte očekávané změny hydrologické bilance a vyhodnoťte účinek opatření v podobě vodní nádrže a zvýšení retence půdy.
+##### Pro vybrané povodí zjistěte očekávané změny hydrologické bilance a vyhodnoťte účinek opatření v podobě vodní nádrže a zvýšení retence půdy.
 
------
+------------------------------------------------------------------------
 
-### Blok 1 - Modelování hydrologické bilance a dopadů klimatické změny
+Blok 1 - Modelování hydrologické bilance a dopadů klimatické změny
+------------------------------------------------------------------
 
-Cílem tohoto bloku je získání dat pro vybrané povodí, kalibrace modelu
-Bilan a odhad dopadů klimatické změny.
+Cílem tohoto bloku je získání dat pro vybrané povodí, kalibrace modelu Bilan a odhad dopadů klimatické změny.
 
 #### Data
 
-Soubor se srážkami, teplotou, odtokem a dalšími informacemi pro vybraná
-pvodí jsou v adresáři data. Shapefile s rozvnodnicemi jednotlivých
-povodí je na stejném místě.
+Soubor se srážkami, teplotou, odtokem a dalšími informacemi pro vybraná pvodí jsou v adresáři data. Shapefile s rozvnodnicemi jednotlivých povodí je na stejném místě.
 
 ``` r
 library(data.table)
@@ -34,31 +32,26 @@ pov = readOGR('povodi.shp')
 ```
 
     ## OGR data source with driver: ESRI Shapefile 
-    ## Source: "/media/WIN/ownCloud/-hanel/KZ5/KZ2019/data/povodi.shp", layer: "povodi"
+    ## Source: "/home/mha/GIT/KZ2019/data/povodi.shp", layer: "povodi"
     ## with 28 features
     ## It has 14 fields
     ## Integer64 fields read as strings:  ID
 
-Seznam povodí je obsažen v atributové tabulce shapefilu povodi.shp, tj.
-`pov@data`. Struktura dat je následující:
+Seznam povodí je obsažen v atributové tabulce shapefilu povodi.shp, tj. `pov@data`. Struktura dat je následující:
 
-  - `DBCN`: databankové číslo
-  - `AREA`: plocha povodí
-  - `DTM`: datum
-  - `Q`: průtok
-  - `PR`: srážky
-  - `TAS`: teplota
-  - `R`: odtok
+-   `DBCN`: databankové číslo
+-   `AREA`: plocha povodí
+-   `DTM`: datum
+-   `Q`: průtok
+-   `PR`: srážky
+-   `TAS`: teplota
+-   `R`: odtok
 
 #### Model Bilan
 
-Manuál modelu je ke stažení
-[zde](http://bilan.vuv.cz/bilan/wp-content/uploads/2015/03/bilan_man_cs_2015-06-23.pdf).
-Soubor k instalaci je v adresáři bilan. Soubor je nutné stáhnout a
-nainstalovat.
+Manuál modelu je ke stažení [zde](http://bilan.vuv.cz/bilan/wp-content/uploads/2015/03/bilan_man_cs_2015-06-23.pdf). Soubor k instalaci je v adresáři bilan. Soubor je nutné stáhnout a nainstalovat.
 
-V Rku vytvoříme novou instanci modelu Bilan pomocí funkce
-    `bil.new`
+V Rku vytvoříme novou instanci modelu Bilan pomocí funkce `bil.new`
 
 ``` r
 library(bilan)
@@ -74,13 +67,9 @@ args(bil.new)
     ##     period = 0, ...) 
     ## NULL
 
-kde `type` určuje typ modelu (`m` - měsíční, `d` - denní), `file`
-umožňuje vytvořit model na základě **výstupního** souboru z modelu
-Bilan, `data` umožňuje vytvořit model na základě **vstupního** souboru
-do modelu Bilan.
+kde `type` určuje typ modelu (`m` - měsíční, `d` - denní), `file` umožňuje vytvořit model na základě **výstupního** souboru z modelu Bilan, `data` umožňuje vytvořit model na základě **vstupního** souboru do modelu Bilan.
 
-Tedy například pro povodí s `DBCN==017000`,
-    píšeme
+Tedy například pro povodí s `DBCN==017000`, píšeme
 
 ``` r
 b = bil.new(type='d', data = dta[DBCN == '017000' & !is.na(R)])
@@ -92,8 +81,7 @@ b = bil.new(type='d', data = dta[DBCN == '017000' & !is.na(R)])
 
     ## Warning in evalq((function (..., call. = TRUE, immediate. = FALSE, noBreaks. = FALSE, : Unknown variable 'Q'. Omitted.
 
-Optimalizace parametrů je možná pomocí příkazu `bil.optimize`, nicméně
-nejdříve je nutné odhadnout evapotranspiraci pomocí funkce `bil.pet`.
+Optimalizace parametrů je možná pomocí příkazu `bil.optimize`, nicméně nejdříve je nutné odhadnout evapotranspiraci pomocí funkce `bil.pet`.
 
 ``` r
 bil.pet(b)
@@ -123,24 +111,20 @@ head(res)
     ## 5: 0.000000 -0.9586942 NA   1
     ## 6: 0.000000 -0.8586942 NA   1
 
-Ve výše uvedeném případě jsme použili defaultní nastavení jak v případě
-funkce `bil.pet` (zde je možné nastavit způsob odhadu a jeho parametry -
-viz `?bil.pet`), tak i v případě `bil.optimize`. Parametry optimalizace
-je možné nastavit pomocí funkce `bil.set.optim`. Zejména můžeme ovlivnit
+Ve výše uvedeném případě jsme použili defaultní nastavení jak v případě funkce `bil.pet` (zde je možné nastavit způsob odhadu a jeho parametry - viz `?bil.pet`), tak i v případě `bil.optimize`. Parametry optimalizace je možné nastavit pomocí funkce `bil.set.optim`. Zejména můžeme ovlivnit
 
-  - metodu optimalizace - `method`
-      - `BS` - půlení intervalu
-      - `DE` - diferenciální evoluce
-  - kritéria optimalizace - `crit`
-      - `MSE` - střední kvadratická chyba
-      - `NS` - Nash-Sutcliffe
-      - `LNNS` - log Nash-Sutcliffe
-      - `MAPE` - střední procentuální chyba
-      - `MAE` - střední absolutní chyba
-  - počet iterací `max_iter`
+-   metodu optimalizace - `method`
+-   `BS` - půlení intervalu
+-   `DE` - diferenciální evoluce
+-   kritéria optimalizace - `crit`
+-   `MSE` - střední kvadratická chyba
+-   `NS` - Nash-Sutcliffe
+-   `LNNS` - log Nash-Sutcliffe
+-   `MAPE` - střední procentuální chyba
+-   `MAE` - střední absolutní chyba
+-   počet iterací `max_iter`
 
-Po provedení optimalizace můžeme zobrazit parametry pomocí příkazu
-`bil.get.params`:
+Po provedení optimalizace můžeme zobrazit parametry pomocí příkazu `bil.get.params`:
 
 ``` r
 bil.get.params(b)
@@ -173,37 +157,33 @@ bil.get.params(b)
     ## 5  Mec  0.011645     0   1.0  0.011645
     ## 6  Grd  0.007155     0   0.5  0.007155
 
------
+### Cvičení 1: Hydrologická bilance
 
-> 1.  vyberte jedno povodí, vytvořte proměnnou obsahující data jen pro
->     vybrané povodí (jak hydroklimatická data, tak rozvodnici povodí).
+------------------------------------------------------------------------
 
-> 2.  převeďte data do měsíčního časového kroku
+1.  vyberte jedno povodí, vytvořte proměnnou obsahující data jen pro vybrané povodí (jak hydroklimatická data, tak rozvodnici povodí).
 
-> 3.  vytvořte model Bilan, vložte do něj data a nakalibrujte
+2.  převeďte data do měsíčního časového kroku
 
-> 4.  vyhodnoťte kalibraci
+3.  vytvořte model Bilan, vložte do něj data a nakalibrujte
 
->   - v protokolu bude: (1) obrázek vybraného území, (2) základní
->     hydroklimatické charakteristiky, (3) vyhodnocení kalibrace modelu
->     Bilan, (4) tabulka s parametry.
+4.  vyhodnoťte kalibraci
 
------
+-   v protokolu bude: (1) obrázek vybraného území, (2) základní hydroklimatické charakteristiky, (3) vyhodnocení kalibrace modelu Bilan, (4) tabulka s parametry.
+
+------------------------------------------------------------------------
 
 ### Nápověda:
 
 #### Práce s `data.table`
 
-  - viz `data.table.md`
-  - agregace na roky např. `ydta = dta[, .(DTM = DTM[1], P = sum(P), T =
-    mean(T), R = sum(R)), by = year(DTM)]`
-  - agregace na roky a měsíce `ymdta = dta[, .(DTM = DTM[1], P = sum(P),
-    T = mean(T), R = sum(R)), by = .(year(DTM), month(DTM))]`
+-   viz `data.table.md`
+-   agregace na roky např. `ydta = dta[, .(DTM = DTM[1], P = sum(P), T = mean(T), R = sum(R)), by = year(DTM)]`
+-   agregace na roky a měsíce `ymdta = dta[, .(DTM = DTM[1], P = sum(P), T = mean(T), R = sum(R)), by = .(year(DTM), month(DTM))]`
 
 #### Kalibrace
 
-  - pro měsíční data je často užitečné použít pro kalibraci
-    diferenciální evoluci, tj. `bil.set.optim(b, method = "DE")`
+-   pro měsíční data je často užitečné použít pro kalibraci diferenciální evoluci, tj. `bil.set.optim(b, method = "DE")`
 
 #### Vizuální vyhodnocení kalibrace
 
@@ -219,22 +199,35 @@ dygraph(re) %>% dyRangeSelector() %>% dyRoller(rollPeriod = 5)
 
 #### Kvantitativní vyhodnocení kalibrace
 
-  - možno použít balík `hydroGOF`
-  - např. `res[, hydroGOF::gof(RM, R)]`
+-   možno použít balík `hydroGOF`
+-   např. `res[, hydroGOF::gof(RM, R)]`
 
 #### \* Interaktivní mapa
 
-Existuje řada možností jak zobrazovat geodata v R. Jednou z nich je
-pomocí knihovny `leaflet`:
+Existuje řada možností jak zobrazovat geodata v R. Jednou z nich je pomocí knihovny `leaflet`:
 
-  - nainstaluj balík `leaflet`
-  - převeď rozvodnici povodí do WGS
-  - vykresli
-
-<!-- end list -->
+-   nainstaluj balík `leaflet`
+-   převeď rozvodnici povodí do WGS
+-   vykresli
 
 ``` r
 require(leaflet)
 wpov = spTransform(pov, CRS('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '))
 leaflet(wpov) %>% addTiles()  %>% addPolygons()
 ```
+
+### Cvičení 2: Dopady klimatické změny
+
+Cílem tohoto cvičení je tvorba scénářů změny klimatu, simulace hydrologické bilance ovlivněné klimatickou změnou a vyhodnocení dopadů klimatické změny na hydrologickou bilanci.
+
+#### Scénáře změny klimatu
+
+Pro tvorbu scénářů změny klimatu využijeme jednu z nejjednodušších metod, tj. přírůstkovou metodu. Tato metoda je založena na úpravě pozorované časové řady srážek a teploty tak, že změny mezi upravenou a původní časovou řadou jsou pro jednotlivé měsíce stejné jako mezi scénářovým a kontroloním období v simulaci klimatického modelu.
+
+Modelování dopadů změny klimatu probíhá podle následujícího schematu:
+
+![modelovani](http://rscn.vuv.cz/rscn/wp-content/uploads/2014/01/obr2-1.png)
+
+-   kde *pozorovaná data* jsou měsíční srážky a teplota z minulého cvičení
+-   *scénářová data* budou vytvořena přírůstkovou metodou
+-   *hydrologický model* je nakalibrovaný model z minulého cvičení
