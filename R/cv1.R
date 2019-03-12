@@ -69,3 +69,5 @@ setwd('../vysledky/')
 saveRDS(mdta, 'obs.rds')
 
 saveRDS(mojePov, 'mojePov.rds')
+
+bil.write.file(b, 'mujBilan.txt')
