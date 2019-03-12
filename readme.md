@@ -9,6 +9,11 @@ Hydrologické modelování dopadů klimatických změn (2018/2019)
     -   [Nápověda](#nápověda)
     -   [Cvičení 2: Dopady klimatické změny](#cvičení-2-dopady-klimatické-změny)
 
+<style>
+ pre,code {
+  font-size:small
+ }
+</style>
 ### Zadání projektu
 
 ##### Pro vybrané povodí zjistěte očekávané změny hydrologické bilance a vyhodnoťte účinek opatření v podobě vodní nádrže a zvýšení retence půdy.
@@ -246,32 +251,106 @@ Pro účely tohoto cvičení jsou k dispozici srážky a teplota simulované glo
 
 ------------------------------------------------------------------------
 
--   \[ \] Načtěte jeden ze souborů simulací klimatického modelu pomocí příkazu `brick`
--   \[ \] Načtěte vybrané povodí z minulého cvičení
--   \[ \] Vypište informace o načtených souborech
--   \[ \] Vykreslete oba soubory
+1.  Načtěte jeden ze souborů simulací klimatického modelu pomocí příkazu `brick`
+2.  Načtěte vybrané povodí z minulého cvičení
+3.  Vypište informace o načtených souborech
+4.  Vykreslete pole teploty pro leden 1950 společně s rozvodnicí vybraného povodí. Nastavte rozsahy os.
+5.  Zvolte vhodnou projekci
+6.  Načtěte pozorovaná data z minulého cvičení (převeďte do měsíčního kroku)
+7.  Načtěte všechna simulovaná data
+    -   Simulované srážky pro kontrolní období `pr_mon_HadGEM2-ES_historical_r1i1p1-1950-2100.nc`
+    -   Simulované srážky pro scénářové období `pr_mon_HadGEM2-ES_rcp85_r1i1p1-1950-2100.nc`
+    -   Simulované teploty pro kontrolní období `tas_mon_HadGEM2-ES_historical_r1i1p1-1950-2100.nc`
+    -   Simulované teploty pro scénářové období `tas_mon_HadGEM2-ES_rcp85_r1i1p1-1950-2100.nc`
+8.  Extrahujte simulovaná data pro vybrané povodí (postupně po jednotlivých souborech)
+9.  Vytvořte data.table `ctrl` obsahující datum, srážky a teploty pro kontrolní období (1960-1990)
+10. Vytvořte data.table `scen` obsahující datum, srážky a teploty pro scénářové období (2070-2100)
+11. Spočítejte měsíční průměry (pomocí argumentu `by` v data.table) - viz první cv. a nápověda k data.table
+12. Propojte datasety měsíčních průměrů a spočtěte změny
+13. Propojte tabulku změn s datasetem pozorovaných srážek a teploty
+14. Vytvořte scénářové řady srážek a teploty, simulujte nakalibrovaným modelem Bilan
 
 ------------------------------------------------------------------------
 
+##### Nápověda
+
 ``` r
 library(raster)
-```
+library(maptools)
 
-    ## 
-    ## Attaching package: 'raster'
-
-    ## The following object is masked from 'package:data.table':
-    ## 
-    ##     shift
-
-``` r
 t_ctrl = brick('./data/tas_mon_HadGEM2-ES_historical_r1i1p1-1950-2100.nc')
-```
-
-    ## Loading required namespace: ncdf4
-
-``` r
 plot(t_ctrl)
 ```
 
 ![](readme_files/figure-markdown_github/unnamed-chunk-9-1.png)
+
+###### Vykreselní jedné vrstvy
+
+``` r
+pov = readOGR('data/povodi.shp')
+```
+
+    ## OGR data source with driver: ESRI Shapefile 
+    ## Source: "/home/mha/GIT/KZ2019/data/povodi.shp", layer: "povodi"
+    ## with 28 features
+    ## It has 14 fields
+    ## Integer64 fields read as strings:  ID
+
+``` r
+plot(t_ctrl[[1]])
+plot(pov, add = TRUE)
+```
+
+![](readme_files/figure-markdown_github/unnamed-chunk-10-1.png)
+
+> :question: Proč nevidíme na mapě povodí?
+
+###### Projekce
+
+Projekce je pro prostorové objekty specifikována pomocí tzv. `proj4` řetězců - viz `proj4string(pov)` a `proj4string(t_ctrl)`. Abychom mohli pracovat dál musíme převést vrstvu vybraného povodí do WGS projekce:
+
+``` r
+wpov = spTransform(pov, proj4string(t_ctrl))
+```
+
+###### Extrakce z rastru dle rozvodnice
+
+Například pro první povodí (`wpov[1,]`):
+
+``` r
+pov_t_ctrl = extract(t_ctrl, wpov[1,], fun = mean)
+```
+
+Jelikož `dimnames(pov_t_hist)` nesou informaci o datumu, můžeme pohodlně vytvořit data.table obsahující datum a jednotlivé záznamy:
+
+``` r
+ctrl = data.table(DTM = as.Date(dimnames(pov_t_ctrl)[[2]], format = 'X%Y.%m.%d'), T_ctrl = pov_t_ctrl[1, ])
+```
+
+###### Měsíční průměry a změny
+
+Načteme a extrahujeme data, podobně jako v předchozím bodě
+
+``` r
+t_scen = brick('./data/tas_mon_HadGEM2-ES_rcp85_r1i1p1-1950-2100.nc')
+pov_t_scen = extract(t_scen, wpov[1,], fun = mean)
+sim = data.table(DTM = as.Date(dimnames(pov_t_scen)[[2]], format = 'X%Y.%m.%d'), T_scen = pov_t_scen[1, ])
+```
+
+Spočteme průměry
+
+``` r
+mscen = sim[, .(T_scen = mean(T_scen)), by = .(month(DTM))]
+mctrl = ctrl[, .(T_ctrl = mean(T_ctrl)), by = .(month(DTM))]
+```
+
+Propojíme pomocí fast-join a spočteme změny:
+
+``` r
+delt = mscen[mctrl, on = 'month']
+delt[, T_del := T_scen-T_ctrl]
+```
+
+Sloupec `del` obsahuje změny ve stupních.
+
+> :exclamation: V našem zadání bude `sim` i `ctrl` obsahovat i srážky. U srážek nebudeme uvažovat rozdíl, ale podíl.
