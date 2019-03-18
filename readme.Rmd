@@ -296,3 +296,47 @@ delt[, T_del := T_scen-T_ctrl]
 Sloupec `del` obsahuje změny ve stupních. 
 
 :exclamation: V našem zadání bude `sim` i `ctrl` obsahovat i srážky. U srážek nebudeme uvažovat rozdíl, ale podíl.
+
+> to do
+
+- zakomponujte do scénářů i změny srážek
+- spočtěte změny odtoku
+- vhodným způsobem vizualizujte a sumarizujte
+
+---
+
+### Cvičení 3: Adaptační opatření
+
+Na předchozích cvičeních jsme získali dvě základní simulace modelem Bilan:
+
+- simulaci pro současné podmínky a 
+- simulaci pro scénář změny klimatu.
+
+Na základě těchto údajů dokážeme kvantifikovat vliv klimatické změny na odtok (např. průměrný měsíční) nebo např. charakteristiky sucha. Na tomto cvičení se budeme zabývat dvěma adaptačními opatřeními:
+
+- zvýšení půdní retence
+- začlenění vodní nádrže
+
+a budeme sledovat, jaký vliv na odtok tato opatření mají. 
+
+#### Retence půdy
+
+V modelu Bilan je retence povodí vyjádřena prostřednictvím parametru `Spa`. Změnu retence tak můžeme simulovat změnou tohoto parametru (model pak již **ne**kalibrujeme). Pro účely tohoto projektu budeme uvažovat změny retence půdy v rozsahu +- 60 %.
+
+> Postup
+
+1. Z uložených souborů vytvořte Bilan pro současné a budoucí podmínky
+2. Vytvořte `for` cyklus, který bude procházet různé hodnoty parametru `Spa` v rozmezí `0.4 * Spa` až `1.6 * Spa`
+   - parametr `Spa` získáte z modelu Bilan pomocí `bil.get.params(b)[1, 'current']`, kde `b` je objekt třídy bilan
+   - naopak jeho hodnotu v modelu změníte pomocí `bil.set.params.curr(b, list(Spa = x))`, kde `x` je nová hodnot parametru
+3. Spočtěte odtok a zásobu vody v půdě s jednotlivými retenčními kapacitami půdy
+4. Vyhodnoťe vliv na odtok (průměrný roční, minimální roční, maximální roční)
+5. Vykreslete grafy 
+   - retence vs. průměrný (minimální/maximální) roční odtok pro současné a budoucí klima
+   - retence vs. změny odtoku (průměrný, minimální, maximální)
+   
+#### Vodní nádrž
+
+K modelování účinku vodní nádrže využijeme model Wateres.
+
+- seznamte se s modelem prostřednictvím materiálu na githubu (https://github.com/tgmwri/wateres).
