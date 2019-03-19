@@ -1,4 +1,4 @@
-source('./R/packages.R')
+#source('./R/packages.R')
 
 library(bilan)
 library(data.table)
@@ -68,4 +68,5 @@ lines(mres_scen$RM_scen, col = 'red')
 plot(mres_scen$RM_scen/mres$RM_ctrl, type = 'l')
 abline(h= 1)
 
+setwd('../vysledky')
 saveRDS(mdta, 'scenar.rds')
