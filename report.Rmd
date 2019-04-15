@@ -1,0 +1,63 @@
+---
+title: "Zpráva o řešení projektu"
+author: "Student Student"
+date: "15 dubna 2019"
+output: 
+  html_document: 
+    toc: yes
+---
+
+---
+
+
+Obecně:
+
+- jednotlivé kapitoly doplňte stručným textem, každý obrázek a tabulku popište
+- odevzdání přes RPubs + odkaz doplnit do tabulky [zde](https://docs.google.com/spreadsheets/d/1StIsvHbOl-KlfuzEhWScYg7avK3l8lddcQCVf8p9QSI/edit?usp=sharing)
+
+
+
+# Úvod
+
+```
+- stručně uveďte cíl studie
+```
+
+# Zájmové území a data
+
+```
+- uveďte základní údaje o zájmovém území a mapu
+- uveďte základní statistiku vstupních dat
+- vložte graf časových řad srážek, teploty a odtoku
+```
+
+# Model Bilan
+
+```
+- popište stručně kalibraci modelu Bilan, uveďte výsledné parametry
+- vykreslete pozorované a simulované odtoky
+- vyhodnoťe kvalitu modelu
+```
+
+# Klimatická změna
+
+```
+- spočtěte měsíční změny srážek a teploty, uveďte v tabulce a vykreslete
+- simulujte změny modelem Bilan, uveďte změny odtoku v tabulce a vykreslete
+```
+
+# Vliv změny retence půdy
+
+```
+- simulujte vliv změny parametru Spa na průměrné, minimální a maximální odtoky, zásobu vody v půdě a výpar
+- výsledky vizualizujte
+```
+
+
+# Závěr
+
+```
+- shrňte co bylo uděláno a co z toho vyplývá
+```
+
+
