@@ -340,3 +340,8 @@ V modelu Bilan je retence povodí vyjádřena prostřednictvím parametru `Spa`.
 K modelování účinku vodní nádrže využijeme model Wateres.
 
 - seznamte se s modelem prostřednictvím materiálu na githubu (https://github.com/tgmwri/wateres).
+
+
+#### Report 
+
+- viz report.Rmd
