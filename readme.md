@@ -1,4 +1,4 @@
-Hydrologické modelování dopadů klimatických změn (2018/2019)
+Hydrologické modelování dopadů klimatických změn (2019/2020)
 ================
 
 <style>
