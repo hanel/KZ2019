@@ -23,7 +23,7 @@ mojeDta = dta[DBCN==.dbcn]
 saveRDS(mojeDta, './moje/dta.rds')
 writeOGR(mojePov, './moje/pov.shp', driver = 'ESRI Shapefile', layer = 'pov')
 
-###
+### ulozeni souboru
 
 mes = mojeDta[, .(DTM = mean(DTM), P = sum(P), T = mean(T), R = sum(R)), by = .(year(DTM), month(DTM))]
 saveRDS(mes[!is.na(R), .(DTM, P, T, R)], './moje/mdta.rds')
